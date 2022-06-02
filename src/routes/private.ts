@@ -9,4 +9,7 @@ router.use(ensureToken);
  * GET USER
  */
 router.get("/user", userController.getUser);
+router.post("/update-user", userController.updateUser);
+router.post("/change-password", userController.changePassword);
+
 export default router;

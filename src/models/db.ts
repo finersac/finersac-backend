@@ -1,12 +1,13 @@
-import mysql from "mysql";
-import dbConfig from "../config/db.config";
+import env from "config/env";
+import * as mysql from "mysql";
+
 // Create a connection to the database
 const connection = mysql.createConnection({
-  host: dbConfig.HOST,
-  user: dbConfig.USER,
-  password: dbConfig.PASSWORD,
-  database: dbConfig.DB,
-  insecureAuth : true
+  host: env.DB_HOST,
+  user: env.DB_USER,
+  password: env.DB_PASSWORD,
+  database: env.DB_NAME,
+  insecureAuth: true,
 });
 // open the MySQL connection
 connection.connect((error) => {

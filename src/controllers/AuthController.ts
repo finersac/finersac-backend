@@ -1,86 +1,85 @@
-import sql from "../models/db";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
-import util from "util";
 import { Request, Response } from "express";
+import env from "config/env";
+import sql from "../models/db";
+import * as jwt from "jsonwebtoken";
+import * as bcrypt from "bcryptjs";
+import * as util from "util";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import { STATUS_400 } from "utils/constants";
+import {
+  RESPONSE_AUTH_ERROR,
+  RESPONSE_EMPTY_BODY,
+  RESPONSE_EMPTY_EMAIL,
+  RESPONSE_EMPTY_PASSWORD,
+} from "utils/constants-request";
+import { ICustomResponse, IRequestBody } from "models/Request";
+import { User } from "models/User";
+
 // node native promisify
 const query = util.promisify(sql.query).bind(sql);
 
 export class AuthController {
-  public async signIn(
-    req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
-    res: Response<any, Record<string, any>>
-  ) {
+  public async signIn(req: IRequestBody<User>, res: ICustomResponse) {
     try {
       const body = req.body;
       if (!body) {
-        return res.sendStatus(403);
+        return res.badReq(RESPONSE_EMPTY_BODY);
       }
 
       const { email, password } = req.body;
       if (!email) {
-        return res.sendStatus(403);
+        return res.badReq(RESPONSE_EMPTY_EMAIL);
       }
       if (!password) {
-        return res.sendStatus(403);
+        return res.badReq(RESPONSE_EMPTY_PASSWORD);
       }
 
-      const response = await query("select * from users where email = ?", [
-        email,
-      ]);
+      const response = await query(
+        "select id, email, password from users where email = ?",
+        [email]
+      );
 
       if (response.length === 0) {
-        return res
-          .status(401)
-          .json({ body: "Correo o contraseña incorrectos" });
+        return res.forbidden(RESPONSE_AUTH_ERROR);
       }
 
       const user = response[0];
       var passwordIsValid = bcrypt.compareSync(password, user?.password);
-      if (!passwordIsValid)
-        return res.status(401).send({
-          auth: false,
-          body: "Correo o contraseña incorrectos",
-          token: null,
-        });
+      if (!passwordIsValid) return res.forbidden(RESPONSE_AUTH_ERROR);
 
-      const token = jwt.sign({ id: user?.id }, "my_secret_key", {
-        expiresIn: 86400,
+      const token = jwt.sign({ id: user?.id }, env.SECRET, {
+        expiresIn: env.TOKEN_LIFE,
       });
-      res.status(200).json({ auth: true, token: token });
+      res.success({ token });
     } catch (error) {
-      throw res.status(500).json({ error });
+      throw res.internal({ message: error });
     }
   }
-  public async createUser(
-    req: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>,
-    res: Response<any, Record<string, any>>
-  ) {
+  public async createUser(req: IRequestBody<User>, res: ICustomResponse) {
     try {
-      const { first_name, last_name, weigth, height, email, password } =
+      const { first_name, last_name, weight, height, email, password } =
         req.body;
 
       if (!email) {
-        return res
-          .status(400)
-          .json({ body: "El correo electronico es requerido" });
+        return res.badReq(RESPONSE_EMPTY_EMAIL);
       }
       if (!password) {
-        return res.status(400).json({ body: "La contraseña es requerida" });
+        return res.badReq(RESPONSE_EMPTY_PASSWORD);
       }
       if (!last_name) {
-        return res.status(400).json({ body: "El nombre es requerido" });
+        return res.status(STATUS_400).json({ body: "El nombre es requerido" });
       }
       if (!first_name) {
-        return res.status(400).json({ body: "El apellido es requerido" });
+        return res
+          .status(STATUS_400)
+          .json({ body: "El apellido es requerido" });
       }
-      if (!weigth) {
-        return res.status(400).json({ body: "El peso es requerido" });
+      if (!weight) {
+        return res.status(STATUS_400).json({ body: "El peso es requerido" });
       }
       if (!height) {
-        return res.status(400).json({ body: "La altura requerida" });
+        return res.status(STATUS_400).json({ body: "La altura requerida" });
       }
 
       const responseEmail = await query("SELECT * from users where email = ?", [
@@ -96,8 +95,8 @@ export class AuthController {
       var hashedPassword = bcrypt.hashSync(password, 8);
 
       await query(
-        "insert into users (email, password, first_name, last_name, weigth, height) VALUES (?, ?, ?, ?, ?, ?)",
-        [email, hashedPassword, first_name, last_name, weigth, height]
+        "insert into users (email, password, first_name, last_name, weight, height) VALUES (?, ?, ?, ?, ?, ?)",
+        [email, hashedPassword, first_name, last_name, weight, height]
       );
       res.status(200).json({ body: "Usuario fue creado con exito" });
     } catch (error) {
