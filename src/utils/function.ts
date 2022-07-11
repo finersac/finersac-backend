@@ -2,7 +2,7 @@ import env from "config/env";
 import { Request } from "express";
 import * as jwt from "jsonwebtoken";
 import { ICustomResponse, IResponse } from "models/Request";
-import { User } from "models/User";
+import { User, UserRole } from "models/User";
 import {
   STATUS_200,
   STATUS_400,
@@ -29,7 +29,7 @@ const ensureToken = (
   const bearerToken = bearer[1];
   jwt.verify(bearerToken, env.SECRET, (err: any, data: any) => {
     if (err) {
-      return res.status(403).json(RESPONSE_TOKEN_EXPIRED);
+      return res.unAuth(RESPONSE_TOKEN_EXPIRED);
     }
     req.body.token = bearerToken;
     req.body.user = data;
@@ -65,7 +65,7 @@ const customResponse = (
    */
   res.badReq = (iResponse: IResponse) => {
     iResponse.code = STATUS_400;
-    return res.status(iResponse.code).error(iResponse);
+    return res.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -74,7 +74,7 @@ const customResponse = (
    */
   res.forbidden = (iResponse: IResponse) => {
     iResponse.code = STATUS_403;
-    return res.status(iResponse.code).error(iResponse);
+    return res.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -83,7 +83,7 @@ const customResponse = (
    */
   res.unAuth = (iResponse: IResponse) => {
     iResponse.code = STATUS_401;
-    return res.status(iResponse.code).error(iResponse);
+    return res.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -98,4 +98,17 @@ const customResponse = (
   next();
 };
 
-export { ensureToken, customResponse };
+const getRole = (idRole: number): UserRole => {
+  switch (idRole) {
+    case 1:
+      return "superadmin";
+    case 2:
+      return "admin";
+    case 3:
+      return "coach";
+    default:
+      return "athlete";
+  }
+};
+
+export { ensureToken, customResponse, getRole };

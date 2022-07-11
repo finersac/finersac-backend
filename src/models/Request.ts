@@ -1,7 +1,9 @@
-import { Response } from "express";
+import { Response, Request } from "express";
+import { User } from "./User";
 
-export interface IRequestBody<T> extends Express.Request {
+export interface IRequestBody<T> extends Request {
   body: T;
+  user?: User;
 }
 
 export interface IResponse {

@@ -1,7 +1,11 @@
+export type UserRole = "superadmin" | "admin" | "coach" | "athlete";
+
 export interface User {
   id: string;
   id_country: string;
-  id_role: string;
+  id_role: number;
+  id_coach: number;
+  role: UserRole;
   first_name: string;
   password: string;
   last_name: string;
@@ -15,6 +19,6 @@ export interface User {
   update_at: Date;
 }
 
-export interface ModelGetUser {
+export interface ModelUserAuth extends User {
   user: User;
 }
