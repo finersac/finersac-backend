@@ -24,8 +24,16 @@ router.post("/panel/create-user", authController.createUser);
 router.post("/panel/update-user", panelController.updateUser);
 
 //PANEL ADMIN EXERCISES
-router.get("/panel/exercises", exercisesController.getExercises);
+router.get(
+  "/panel/verified-exercises",
+  exercisesController.getVerifiedExercises
+);
+router.get(
+  "/panel/unverified-exercises",
+  exercisesController.getUnverifiedExercises
+);
 router.post("/panel/create-exercise", exercisesController.createExercise);
 router.post("/panel/update-exercise", exercisesController.updateExercises);
+router.post("/panel/upload-exercises", exercisesController.uploadExercise);
 
 export default router;

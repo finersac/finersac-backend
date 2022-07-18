@@ -3,32 +3,54 @@ import * as util from "util";
 
 import { pickBy, identity, camelCase, capitalize } from "lodash";
 import { ICustomResponse, IRequestBody } from "models/Request";
-import { ModelUserAuth } from "models/User";
 
 import {
   RESPONSE_EMPTY_EXERCISE_NAME,
   RESPONSE_EXERCISE_ALREADY_EXISTS,
   RESPONSE_EXERCISE_CREATED,
-  RESPONSE_USER_ALREADY_EXISTS,
 } from "utils/constants-request";
 
 import sql from "models/db";
-import { Exercise } from "models/Exercises";
+import {
+  Exercise,
+  ModelUserWithExercise,
+  ModelUserWithExercises,
+} from "models/Exercises";
 // node native promisify
 const query = util.promisify(sql.query).bind(sql);
 
 export class ExercisesController {
-  public async getExercises(
-    req: IRequestBody<ModelUserAuth>,
+  public async getVerifiedExercises(
+    req: IRequestBody<ModelUserWithExercise>,
     res: ICustomResponse
   ) {
     try {
-      const response = await query(
-        `select id, exercise_name, video_url, preview_base64, create_at, update_at from exercises where deleted = 0`,
+      const resultVerify = await query(
+        `select id, exercise_name, video_url, preview_base64, is_verified, create_at, update_at from exercises where is_verified = 1 and deleted = 0`,
         []
       );
-      const exercises: Exercise[] = response;
-      res.success({ result: exercises });
+      const exercisesVerify: Exercise[] = resultVerify;
+      res.success({
+        result: exercisesVerify,
+      });
+    } catch (error) {
+      throw res.internal({ message: error });
+    }
+  }
+
+  public async getUnverifiedExercises(
+    req: IRequestBody<ModelUserWithExercise>,
+    res: ICustomResponse
+  ) {
+    try {
+      const resultUnVerify = await query(
+        `select id, exercise_name, video_url, preview_base64, is_verified, create_at, update_at from exercises where is_verified = 0 and deleted = 0`,
+        []
+      );
+      const exercisesUnVerify: Exercise[] = resultUnVerify;
+      res.success({
+        result: exercisesUnVerify,
+      });
     } catch (error) {
       throw res.internal({ message: error });
     }
@@ -56,12 +78,17 @@ export class ExercisesController {
         return res.forbidden(RESPONSE_EXERCISE_ALREADY_EXISTS);
       }
 
-      await query(
+      const result = await query(
         "insert into exercises (exercise_name, video_url, preview_base64) VALUES (?, ?, ?)",
         [exerciseName, video_url, preview_base64]
       );
 
-      return res.success(RESPONSE_EXERCISE_CREATED);
+      const response = await query(
+        "select id, exercise_name, video_url, preview_base64, is_verified, create_at, update_at from exercises where id = ?",
+        [result.insertId]
+      );
+
+      return res.success({ result: response[0] });
     } catch (error) {
       throw res.internal({ message: error });
     }
@@ -71,7 +98,14 @@ export class ExercisesController {
     req: IRequestBody<Exercise>,
     res: ICustomResponse
   ) {
-    const { id, exercise_name, video_url, preview_base64, deleted } = req.body;
+    const {
+      id,
+      exercise_name,
+      video_url,
+      preview_base64,
+      is_verified,
+      deleted,
+    } = req.body;
 
     const cleanedObject = pickBy(
       {
@@ -79,17 +113,45 @@ export class ExercisesController {
         video_url,
         preview_base64,
         deleted,
+        is_verified,
       },
       identity
     );
-    const data = [{ ...cleanedObject }, id];
+    const data = [cleanedObject, id];
 
     try {
-      const response = await query("UPDATE exercises SET ? WHERE id = ?", data);
+      await query("UPDATE exercises SET ? WHERE id = ?", data);
+      const result = await query(
+        "select id, exercise_name, video_url, preview_base64, is_verified, create_at, update_at from exercises where id = ?",
+        [id]
+      );
 
-      const exercise = response[0];
+      const exercise = result[0];
 
       res.success({ result: exercise });
+    } catch (error) {
+      throw res.internal({ message: error });
+    }
+  }
+
+  public async uploadExercise(
+    req: IRequestBody<ModelUserWithExercises>,
+    res: ICustomResponse
+  ) {
+    const { exercises } = req.body;
+
+    const data = [
+      exercises.map((exercise) => [exercise.exercise_name, exercise.video_url]),
+    ];
+
+    await query(
+      `INSERT INTO exercises (exercise_name, video_url) VALUES ? ON DUPLICATE KEY UPDATE exercise_name = VALUES(exercise_name),
+      video_url = VALUES(video_url);`,
+      data
+    );
+
+    try {
+      res.success({ result: [] });
     } catch (error) {
       throw res.internal({ message: error });
     }
