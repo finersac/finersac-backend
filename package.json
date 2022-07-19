@@ -2,10 +2,11 @@
   "name": "finersac-backend",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node src/app.ts",
+    "start": "node dist/app.js",
+    "postinstall": "tsc",
     "serve": "node ./dist/index.js",
     "lint": "tslint -p tsconfig.json",
     "prettier": "prettier --config ./.prettierrc --write src/**/*.ts",
