@@ -1,11 +1,13 @@
-import { Response, Request } from "express";
+import { Response } from "express";
 import * as util from "util";
 
-import { pickBy, identity, capitalize } from "lodash";
+import { pickBy, identity, camelCase, capitalize } from "lodash";
+import { ICustomResponse, IRequestBody } from "models/Request";
 
 import {
   RESPONSE_EMPTY_EXERCISE_NAME,
   RESPONSE_EXERCISE_ALREADY_EXISTS,
+  RESPONSE_EXERCISE_CREATED,
 } from "utils/constants-request";
 
 import sql from "models/db";
@@ -19,8 +21,8 @@ const query = util.promisify(sql.query).bind(sql);
 
 export class ExercisesController {
   public async getVerifiedExercises(
-    req: Request<ModelUserWithExercise>,
-    res: Response
+    req: IRequestBody<ModelUserWithExercise>,
+    res: ICustomResponse
   ) {
     try {
       const resultVerify = await query(
@@ -37,8 +39,8 @@ export class ExercisesController {
   }
 
   public async getUnverifiedExercises(
-    req: Request<ModelUserWithExercise>,
-    res: Response
+    req: IRequestBody<ModelUserWithExercise>,
+    res: ICustomResponse
   ) {
     try {
       const resultUnVerify = await query(
@@ -55,15 +57,14 @@ export class ExercisesController {
   }
 
   public async createExercise(
-    req: Request<Exercise>,
-    res: Response
+    req: IRequestBody<Exercise>,
+    res: ICustomResponse
   ): Promise<Response> {
     try {
       const { exercise_name, video_url, preview_base64 } = req.body;
 
       if (!exercise_name) {
-        res.badReq(RESPONSE_EMPTY_EXERCISE_NAME);
-        return;
+        return res.badReq(RESPONSE_EMPTY_EXERCISE_NAME);
       }
 
       const exerciseName = capitalize(String(exercise_name).trim());
@@ -74,8 +75,7 @@ export class ExercisesController {
       );
 
       if (responseExercise.length > 0) {
-        res.forbidden(RESPONSE_EXERCISE_ALREADY_EXISTS);
-        return;
+        return res.forbidden(RESPONSE_EXERCISE_ALREADY_EXISTS);
       }
 
       const result = await query(
@@ -88,13 +88,16 @@ export class ExercisesController {
         [result.insertId]
       );
 
-      res.success({ result: response[0] });
+      return res.success({ result: response[0] });
     } catch (error) {
       throw res.internal({ message: error });
     }
   }
 
-  public async updateExercises(req: Request<Exercise>, res: Response) {
+  public async updateExercises(
+    req: IRequestBody<Exercise>,
+    res: ICustomResponse
+  ) {
     const {
       id,
       exercise_name,
@@ -132,8 +135,8 @@ export class ExercisesController {
   }
 
   public async uploadExercise(
-    req: Request<ModelUserWithExercises>,
-    res: Response
+    req: IRequestBody<ModelUserWithExercises>,
+    res: ICustomResponse
   ) {
     const { exercises } = req.body;
 

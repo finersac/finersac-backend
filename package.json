@@ -5,9 +5,10 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/src/app.js",
+    "start": "npm run postinstall && ts-node dist/src/app.js",
+    "start:dev": "nodemon src/app.ts",
     "postinstall": "tsc",
-    "serve": "node ./dist/index.js",
+    "test:unit": "jest",
     "lint": "tslint -p tsconfig.json",
     "prettier": "prettier --config ./.prettierrc --write src/**/*.ts",
     "deploy": "git add . && git commit -m Heroku && git push heroku master",
