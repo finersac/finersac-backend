@@ -1,7 +1,7 @@
 import env from "config/env";
-import { Request } from "express";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { ICustomResponse, IResponse } from "models/Request";
+import { IResponse } from "models/Request";
 import { User, UserRole } from "models/User";
 import {
   STATUS_200,
@@ -17,7 +17,7 @@ import {
 
 const ensureToken = (
   req: Request<{ token: string; user: User }>,
-  res: ICustomResponse,
+  res: Response,
   next: Function
 ) => {
   const bearerHeader = req.headers["authorization"];
@@ -37,11 +37,7 @@ const ensureToken = (
   });
 };
 
-const customResponse = (
-  req: Request,
-  res: ICustomResponse,
-  next: Function
-): void => {
+const customResponse = (req: Request, res: Response, next: Function): void => {
   /**
    * (default status 200)
    * Success response
