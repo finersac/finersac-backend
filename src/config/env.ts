@@ -1,4 +1,4 @@
-export default {
+const env = {
   ENV: process.env.ENV,
   PORT: process.env.PORT,
   HOST: process.env.HOST,
@@ -14,3 +14,5 @@ export default {
   DB_NAME: process.env.DB_NAME,
   SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
 };
+
+export default env;

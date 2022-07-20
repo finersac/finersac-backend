@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/app.js",
+    "start": "NODE_PATH=dist/src node dist/src/app.js",
     "postinstall": "tsc",
     "serve": "node ./dist/index.js",
     "lint": "tslint -p tsconfig.json",

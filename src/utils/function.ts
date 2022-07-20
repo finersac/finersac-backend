@@ -1,6 +1,6 @@
 import env from "config/env";
 import { Request } from "express";
-import * as jwt from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { ICustomResponse, IResponse } from "models/Request";
 import { User, UserRole } from "models/User";
 import {
@@ -27,7 +27,7 @@ const ensureToken = (
 
   const bearer = bearerHeader.split(" ");
   const bearerToken = bearer[1];
-  jwt.verify(bearerToken, env.SECRET, (err: any, data: any) => {
+  jwt.verify(bearerToken, env.SECRET || "", (err: any, data: any) => {
     if (err) {
       return res.unAuth(RESPONSE_TOKEN_EXPIRED);
     }

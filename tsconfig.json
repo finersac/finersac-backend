@@ -1,14 +1,20 @@
 {
   "compilerOptions": {
     "target": "ES2018",
+    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
+    "importHelpers": true,
     "module": "commonjs",
+    "pretty": true,
     "lib": ["es5", "es6", "dom"],
-    "outDir": "./dist",
+    "outDir": "dist",
     "strict": false,
     "sourceMap": true,
     "strictPropertyInitialization": false /* Enable strict checking of property initialization in classes. */,
-		"moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+    "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     "baseUrl": "./src",
+    "skipLibCheck": true,
+    "rootDir": "./",
     "paths": {
       "controllers/*": ["controllers/*"],
       "models/*": ["models/*"],
@@ -18,8 +24,8 @@
       "config/*": ["config/*"]
     },
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
-		"experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
-		"emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
+    "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+    "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include": ["src/**/*"]
+  "include": ["./src/**/*"]
 }
