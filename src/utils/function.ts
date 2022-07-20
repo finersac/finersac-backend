@@ -1,8 +1,8 @@
 import env from "config/env";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-import { ICustomResponse, IResponse } from "../models/Request";
-import { User, UserRole } from "../models/User";
+import { ICustomResponse, IResponse } from "models/Request";
+import { User, UserRole } from "models/User";
 import {
   STATUS_200,
   STATUS_400,
@@ -22,7 +22,7 @@ const ensureToken = (
 ) => {
   const bearerHeader = req.headers["authorization"];
   if (typeof bearerHeader === "undefined") {
-    return res.status(403).json(RESPONSE_TOKEN_EMPTY);
+    return res?.status(403).json(RESPONSE_TOKEN_EMPTY);
   }
 
   const bearer = bearerHeader.split(" ");
@@ -48,7 +48,7 @@ const customResponse = (
    */
   res.success = (iResponse: IResponse) => {
     iResponse.code = STATUS_200;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -56,7 +56,7 @@ const customResponse = (
    */
   res.error = (iResponse: IResponse) => {
     iResponse.code = STATUS_400;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -65,7 +65,7 @@ const customResponse = (
    */
   res.badReq = (iResponse: IResponse) => {
     iResponse.code = STATUS_400;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -74,7 +74,7 @@ const customResponse = (
    */
   res.forbidden = (iResponse: IResponse) => {
     iResponse.code = STATUS_403;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -83,7 +83,7 @@ const customResponse = (
    */
   res.unAuth = (iResponse: IResponse) => {
     iResponse.code = STATUS_401;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   /**
@@ -92,7 +92,7 @@ const customResponse = (
    */
   res.internal = (iResponse: IResponse) => {
     iResponse.code = STATUS_500;
-    return res.status(iResponse.code).json(iResponse);
+    return res?.status(iResponse.code).json(iResponse);
   };
 
   next();
