@@ -22,7 +22,6 @@ import {
   RESPONSE_USER_CREATED,
   RESPONSE_USER_NOT_EXIST,
 } from "utils/constants-request";
-import { ICustomResponse, IRequestBody } from "models/Request";
 import { User } from "models/User";
 import { MailDataRequired } from "@sendgrid/mail";
 import { getRole } from "utils/function";
@@ -31,7 +30,7 @@ import { getRole } from "utils/function";
 const query = util.promisify(sql.query).bind(sql);
 
 export class AuthController {
-  public async signIn(req: IRequestBody<User>, res: ICustomResponse) {
+  public async signIn(req: Request<User>, res: Response) {
     try {
       const body = req.body;
       if (!body) {
@@ -77,8 +76,8 @@ export class AuthController {
   }
 
   public async createUser(
-    req: IRequestBody<User>,
-    res: ICustomResponse
+    req: Request<User>,
+    res: Response
   ): Promise<Response> {
     try {
       const {
@@ -93,25 +92,32 @@ export class AuthController {
       } = req.body;
 
       if (!email) {
-        return res.badReq(RESPONSE_EMPTY_EMAIL);
+        res.badReq(RESPONSE_EMPTY_EMAIL);
+        return;
       }
       if (!password) {
-        return res.badReq(RESPONSE_EMPTY_PASSWORD);
+        res.badReq(RESPONSE_EMPTY_PASSWORD);
+        return;
       }
       if (!first_name) {
-        return res.badReq(RESPONSE_EMPTY_FIRST_NAME);
+        res.badReq(RESPONSE_EMPTY_FIRST_NAME);
+        return;
       }
       if (!last_name) {
-        return res.badReq(RESPONSE_EMPTY_LAST_NAME);
+        res.badReq(RESPONSE_EMPTY_LAST_NAME);
+        return;
       }
       if (!weight) {
-        return res.badReq(RESPONSE_EMPTY_WEIGHT);
+        res.badReq(RESPONSE_EMPTY_WEIGHT);
+        return;
       }
       if (!height) {
-        return res.badReq(RESPONSE_EMPTY_HEIGHT);
+        res.badReq(RESPONSE_EMPTY_HEIGHT);
+        return;
       }
       if (!id_role) {
-        return res.badReq(RESPONSE_EMPTY_ROLE);
+        res.badReq(RESPONSE_EMPTY_ROLE);
+        return;
       }
 
       const responseEmail = await query("SELECT * from users where email = ?", [
@@ -119,7 +125,8 @@ export class AuthController {
       ]);
 
       if (responseEmail.length > 0) {
-        return res.forbidden(RESPONSE_USER_ALREADY_EXISTS);
+        res.forbidden(RESPONSE_USER_ALREADY_EXISTS);
+        return;
       }
 
       const hashedPassword = bcrypt.hashSync(password, 8);
@@ -141,22 +148,23 @@ export class AuthController {
         "select id, id_country, id_role, id_coach, email, first_name, last_name, path_photo, weight, height, blocked, create_at, update_at from users where id = ?",
         [result.insertId]
       );
-      return res.success({ result: response[0] });
+      res.success({ result: response[0] });
     } catch (error) {
       throw res.internal({ message: error });
     }
   }
 
   public async forgotPassword(
-    req: IRequestBody<User>,
-    res: ICustomResponse
+    req: Request<User>,
+    res: Response
   ): Promise<Response> {
     const { email } = req.body;
 
     try {
       //check if user exists
       if (!email) {
-        return res.badReq(RESPONSE_EMPTY_EMAIL);
+        res.badReq(RESPONSE_EMPTY_EMAIL);
+        return;
       }
       const response: User[] = await query(
         "SELECT id from users where email = ?",
@@ -164,7 +172,8 @@ export class AuthController {
       );
 
       if (!response.length) {
-        return res.forbidden(RESPONSE_USER_NOT_EXIST);
+        res.forbidden(RESPONSE_USER_NOT_EXIST);
+        return;
       }
 
       const user: User = response[0];
@@ -184,7 +193,7 @@ export class AuthController {
         },
       };
       await sgMail.send(content);
-      return res.success(RESPONSE_EMAIL_SEND);
+      res.success(RESPONSE_EMAIL_SEND);
     } catch (error) {
       res.internal({ message: error.message });
     }

@@ -23,11 +23,10 @@
       "utils/*": ["utils/*"],
       "config/*": ["config/*"]
     },
+    "typeRoots": ["./node_modules/@types", "./src/models"],
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
     "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["node_modules"],
-  "typeRoots": ["./node_module/@types", "./src/models"]
+  "include": ["./src/**/*"],
 }

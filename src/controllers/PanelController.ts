@@ -1,24 +1,14 @@
-import { Response } from "express";
+import { Response, Request } from "express";
 import * as util from "util";
-import * as bcrypt from "bcryptjs";
-import { pickBy, identity, isEmpty } from "lodash";
-import { ICustomResponse, IRequestBody } from "models/Request";
+import { pickBy, identity } from "lodash";
 import { ModelUserAuth, User } from "models/User";
-import {
-  RESPONSE_EMPTY_PASSWORD,
-  RESPONSE_FAILED_TO_UPDATE_USER,
-} from "utils/constants-request";
 
 import sql from "models/db";
-import { getRole } from "utils/function";
 // node native promisify
 const query = util.promisify(sql.query).bind(sql);
 
 export class PanelController {
-  public async getUsers(
-    req: IRequestBody<ModelUserAuth>,
-    res: ICustomResponse
-  ) {
+  public async getUsers(req: Request<ModelUserAuth>, res: Response) {
     try {
       const { id: userId, role } = req.body.user;
       let sqlExec = "";
@@ -45,10 +35,7 @@ export class PanelController {
     }
   }
 
-  public async updateUser(
-    req: IRequestBody<ModelUserAuth>,
-    res: ICustomResponse
-  ) {
+  public async updateUser(req: Request<ModelUserAuth>, res: Response) {
     const {
       id: userId,
       first_name,
@@ -89,10 +76,7 @@ export class PanelController {
     }
   }
 
-  public async getCoaches(
-    req: IRequestBody<ModelUserAuth>,
-    res: ICustomResponse
-  ) {
+  public async getCoaches(req: Request<ModelUserAuth>, res: Response) {
     try {
       const { id: userId } = req.body.user;
 
