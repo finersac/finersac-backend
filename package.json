@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run postinstall && ts-node dist/src/app.ts",
+    "start": "npm run postinstall && ts-node dist/src/app.js",
     "start:dev": "nodemon src/app.ts",
     "postinstall": "tsc",
     "test:unit": "jest",
@@ -41,16 +41,11 @@
     "typescript": "^4.6.4"
   },
   "dependencies": {
-    "@types/express": "^4.17.13",
-    "@types/lodash": "^4.14.182",
     "@sendgrid/mail": "^7.7.0",
     "@types/bcryptjs": "^2.4.2",
-    "@types/node": "^17.0.31",
     "@types/cors": "^2.8.12",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/mysql": "^2.15.21",
-    "ts-node": "^10.7.0",
-    "typescript": "^4.6.4",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
