@@ -29,4 +29,5 @@
   },
   "include": ["./src/**/*.ts"],
   "exclude": ["node_modules"],
+  "typeRoots": ["./node_module/@types", "./src/models"]
 }
