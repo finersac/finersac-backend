@@ -1,8 +1,8 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import * as util from "util";
 import * as bcrypt from "bcryptjs";
 import { pickBy, identity, isEmpty } from "lodash";
-import { ICustomResponse, IRequestBody } from "models/Request";
+// import { Response, Request } from "models/Request";
 import { ModelUserAuth, User } from "models/User";
 import {
   RESPONSE_EMPTY_PASSWORD,
@@ -14,7 +14,7 @@ import sql from "models/db";
 const query = util.promisify(sql.query).bind(sql);
 
 export class UserController {
-  public async getUser(req: IRequestBody<ModelUserAuth>, res: ICustomResponse) {
+  public async getUser(req: Request<ModelUserAuth>, res: Response) {
     try {
       const { id: userId } = req.body.user;
       const response = await query(
@@ -29,8 +29,8 @@ export class UserController {
   }
 
   public async updateUser(
-    req: IRequestBody<ModelUserAuth>,
-    res: ICustomResponse
+    req: Request<ModelUserAuth>,
+    res: Response
   ) {
     const {
       first_name,
@@ -69,8 +69,8 @@ export class UserController {
   }
 
   public async resetPassword(
-    req: IRequestBody<ModelUserAuth>,
-    res: ICustomResponse
+    req: Request<ModelUserAuth>,
+    res: Response
   ) {
     try {
       const { password } = req.body;
