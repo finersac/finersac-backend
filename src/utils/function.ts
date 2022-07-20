@@ -1,8 +1,8 @@
 import env from "config/env";
 import { Request } from "express";
 import jwt from "jsonwebtoken";
-import { ICustomResponse, IResponse } from "models/Request";
-import { User, UserRole } from "models/User";
+import { ICustomResponse, IResponse } from "../models/Request";
+import { User, UserRole } from "../models/User";
 import {
   STATUS_200,
   STATUS_400,
