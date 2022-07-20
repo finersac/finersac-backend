@@ -1,7 +1,7 @@
-import { Response, Request } from "express";
+import * as express from "express";
 import { User } from "./User";
 
-export interface IRequestBody<T> extends Request {
+export interface IRequestBody<T> extends express.Request {
   body: T;
   user?: User;
 }
@@ -14,11 +14,11 @@ export interface IResponse {
   token?: string;
 }
 
-export interface ICustomResponse extends Response {
-  success: (data: IResponse) => Response;
-  error: (data: IResponse) => Response;
-  badReq: (data: IResponse) => Response;
-  forbidden: (data: IResponse) => Response;
-  unAuth: (data: IResponse) => Response;
-  internal: (data: IResponse) => Response;
+export interface ICustomResponse extends express.Response {
+  success: (data: IResponse) => express.Response;
+  error: (data: IResponse) => express.Response;
+  badReq: (data: IResponse) => express.Response;
+  forbidden: (data: IResponse) => express.Response;
+  unAuth: (data: IResponse) => express.Response;
+  internal: (data: IResponse) => express.Response;
 }
