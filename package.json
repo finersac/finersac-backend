@@ -5,7 +5,7 @@
   "main": "src/app.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run postinstall && ts-node --files dist/src/app.js",
+    "start": "npm run postinstall && ts-node --files dist/src/app.ts",
     "start:dev": "nodemon src/app.ts",
     "postinstall": "tsc",
     "test:unit": "jest",
